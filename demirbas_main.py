@@ -14,19 +14,19 @@ class MainWindow(QMainWindow):
         self.setWindowIcon(QIcon('icon/dmr_cube.png'))
 
         self.setWindowTitle("Demirbaş Yönetim Sistemi")
-        self.setMinimumSize(800, 600)
+        self.setMinimumSize(700, 500)
 
         self.arama = QLineEdit()
 
         self.tableWidget = QTableWidget()
+        self.tableWidget.setEditTriggers(QAbstractItemView.NoEditTriggers)
+        self.tableWidget.setSelectionBehavior(QAbstractItemView.SelectRows)
+        self.tableWidget.setSelectionMode(QAbstractItemView.SingleSelection)
+        self.tableWidget.setShowGrid(False)
         self.tableWidget.setAlternatingRowColors(True)
         self.tableWidget.setColumnCount(6)
-        self.tableWidget.horizontalHeader().setCascadingSectionResizes(False)
-        self.tableWidget.horizontalHeader().setSortIndicatorShown(False)
-        self.tableWidget.horizontalHeader().setStretchLastSection(True)
         self.tableWidget.verticalHeader().setVisible(False)
-        self.tableWidget.verticalHeader().setCascadingSectionResizes(False)
-        self.tableWidget.verticalHeader().setStretchLastSection(False)
+        self.tableWidget.horizontalHeader().setStretchLastSection(True)
         self.tableWidget.setHorizontalHeaderLabels(("id", "Demirbaş No", "Ad", "Teslim Alan", "Tarih", "Kategori"))
 
         self.arama_label = QLabel("ARA")
