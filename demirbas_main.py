@@ -18,6 +18,8 @@ class MainWindow(QMainWindow):
 
         self.arama = QLineEdit()
 
+        self.arama.textChanged.connect(self.onTextChange)
+
         self.tableWidget = QTableWidget()
         self.tableWidget.setEditTriggers(QAbstractItemView.NoEditTriggers)
         self.tableWidget.setSelectionBehavior(QAbstractItemView.SelectRows)
@@ -28,6 +30,7 @@ class MainWindow(QMainWindow):
         self.tableWidget.verticalHeader().setVisible(False)
         self.tableWidget.horizontalHeader().setStretchLastSection(True)
         self.tableWidget.setHorizontalHeaderLabels(("id", "Demirbaş No", "Ad", "Teslim Alan", "Tarih", "Kategori"))
+        self.tableWidget.itemSelectionChanged.connect(self.onTableChange)
 
         self.arama_label = QLabel("ARA")
         self.arama_label.setFixedWidth(50)
@@ -75,27 +78,26 @@ class MainWindow(QMainWindow):
         toolbar.addAction(btn_demirbas_sil)
 
         self.widget = QWidget(self)
-        self.setCentralWidget(self.widget)
         self.widget.setLayout(self.dikey)
+        self.setCentralWidget(self.widget)
+        self.liste =[]
+        self.liste_hazirla()
+
+        self.dindex = None
 
     def veriyukle(self):
-        db = db_helper()
-        result = db.demirbas_liste()
+        result = self.liste
+        self.tableWidget.clearSelection()
         self.tableWidget.setRowCount(0)
+        self.dindex=None
         for row_number, row_data in enumerate(result):
             self.tableWidget.insertRow(row_number)
             self.tableWidget.setItem(row_number, 0, QTableWidgetItem(str(row_data[0])))
             self.tableWidget.setItem(row_number, 1, QTableWidgetItem(str(row_data[1])))
             self.tableWidget.setItem(row_number, 2, QTableWidgetItem(str(row_data[2])))
-            kisi = db.kisi(row_data[3])
-            self.tableWidget.setItem(row_number, 3, QTableWidgetItem(kisi[1]))
+            self.tableWidget.setItem(row_number, 3, QTableWidgetItem(str(row_data[3])))
             self.tableWidget.setItem(row_number, 4, QTableWidgetItem(str(row_data[4])))
-
-            if row_data[5] == -1:
-                kat = "Kategorisiz"
-            else:
-                kat = db.kategori(row_data[5])[1]
-            self.tableWidget.setItem(row_number, 5, QTableWidgetItem(kat))
+            self.tableWidget.setItem(row_number, 5, QTableWidgetItem(str(row_data[5])))
 
     def delete(self):
         ind = self.tableWidget.currentRow()
@@ -107,35 +109,95 @@ class MainWindow(QMainWindow):
                 ind = int(self.tableWidget.item(ind, 0).text())
                 db = db_helper()
                 db.demirbas_sil(ind)
+                self.liste_hazirla()
                 self.veriyukle()
 
     def kategori(self):
         katekr = kategori_ekr(self)
         result = katekr.exec()
-        print(result)
-
-    def about(self):
-        pass
+        self.liste_hazirla()
+        self.veriyukle()
 
     def demirbasekle(self):
         urunekle_ekran = urunekle(self)
         result = urunekle_ekran.exec()
         if result == QDialog.Accepted:
+            self.liste_hazirla()
             self.veriyukle()
 
     def demirbasduzenle(self):
-        ind = self.tableWidget.currentRow()
-        ind = int(self.tableWidget.item(ind, 0).text())
-        urunekle_ekran = urunekle(self, ind)
-        result = urunekle_ekran.exec()
-        if result == QDialog.Accepted:
+        if self.dindex!= None:
+            ind = self.dindex
+            urunekle_ekran = urunekle(self, ind)
+            result = urunekle_ekran.exec()
+            print(result)
+            self.liste_hazirla()
             self.veriyukle()
+        else:
+            QMessageBox.information(self,"UYARI","Lütfen bir kayıt seçiniz.")
 
     def kisiekle(self):
         kisiekr = kisiler_ekr(self)
         result = kisiekr.exec()
-        print(result)
+        self.liste_hazirla()
+        self.veriyukle()
 
+    def liste_hazirla(self):
+        self.tableWidget.clearSelection()
+        self.arama.setText("")
+        db=db_helper()
+        demirbas_liste=db.demirbas_liste()
+        lst=[]
+        for d in demirbas_liste:
+            tlst=[]
+            tlst.append(d[0])
+            tlst.append(d[1])
+            tlst.append(d[2])
+            tlst.append(db.kisi(d[3])[1])
+            tlst.append(d[4])
+            if d[5]>-1:
+                tlst.append(db.kategori(d[5])[1])
+            else:
+                tlst.append("Kategorisiz")
+            tlst.append(d[6])
+            tlst.append(d[7])
+            tlst.append(d[8])
+            tlst.append(d[9])
+            tlst.append(d[10])
+            tlst.append(d[11])
+            tlst.append(d[12])
+            tlst.append(d[13])
+            lst.append(tlst)
+        self.liste = lst
+
+    def fa(self, s1, s2):
+        if s1 in s2:
+            return True
+        else:
+            return False
+
+    def filtre(self, ar):
+        lst = []
+        for r in self.liste:
+            for k in r:
+                if self.fa(ar, str(k)):
+                    lst.append(r)
+                    break
+        self.liste = lst
+
+    def onTextChange(self, e):
+        self.tableWidget.clearSelection()
+
+        if len(e) > 1:
+            self.filtre(e)
+        else:
+            self.liste = self.liste_hazirla()
+        self.veriyukle()
+
+    def onTableChange(self):
+        ind = self.tableWidget.currentRow()
+        ind = int(self.tableWidget.item(ind, 0).text())
+        self.dindex = ind
 
 app = QApplication(sys.argv)
 if (QDialog.Accepted == True):

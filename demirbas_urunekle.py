@@ -77,7 +77,8 @@ class urunekle(QDialog):
             date_obj = datetime.strptime(self.dmr[4], '%d.%m.%Y')
             self.islem_tarihi.setDate(date_obj.date())
             kc = self.combo_index(self.kategori_liste, self.dmr[5])
-            self.kategori.setCurrentIndex(kc)
+            print(kc)
+            self.kategori.setCurrentIndex(kc+1)
             self.adet.setText(str(self.dmr[6]))
             self.marka.setText(self.dmr[7])
             self.model.setText(self.dmr[8])
@@ -158,7 +159,7 @@ class urunekle(QDialog):
         lst.append(self.bulundugu_yer.text())
         lst.append(str(self.aciklama.toPlainText()))
 
-        if self.dindex!=None:
+        if self.dindex != None:
             print("Düzenle")
             self.db.demirbas_duzenle(lst, self.dindex)
         else:
@@ -176,11 +177,12 @@ class urunekle(QDialog):
         for kisi in liste:
             if kisi[1] == isim:
                 return kisi[0]
-
         return -1
 
     def combo_index(self, liste, idx):
         a = 0
+        if idx == -1:
+            return -1
         for k in liste:
             if k[0] == idx:
                 return a
