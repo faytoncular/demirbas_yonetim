@@ -2,6 +2,8 @@ from PyQt5.QtWidgets import *
 from demirbas_db import *
 from datetime import *
 
+from demirbas_detay_gui import demirbas_detay
+
 
 class urunekle(QDialog):
     def __init__(self, parent, dindex=None):
@@ -119,6 +121,9 @@ class urunekle(QDialog):
         self.tablelayout.addWidget(qw, 13, 1)
 
         self.setLayout(self.tablelayout)
+
+        self.demirbas_dt=demirbas_detay()
+
 
     def onKaydetBtnClick(self):
         lst = []

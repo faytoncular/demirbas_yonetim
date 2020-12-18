@@ -4,6 +4,7 @@ from PyQt5.QtGui import *
 from demirbas_urunekle import *
 from kisiler_dialog import *
 from kategori_dialog import *
+from demirbas_detay_gui import *
 import sys
 
 
@@ -13,7 +14,7 @@ class MainWindow(QMainWindow):
         self.setWindowIcon(QIcon('icon/dmr_cube.png'))
 
         self.setWindowTitle("Demirbaş Yönetim Sistemi")
-        self.setMinimumSize(700, 500)
+        self.setMinimumSize(950, 500)
 
         self.arama = QLineEdit()
 
@@ -36,6 +37,7 @@ class MainWindow(QMainWindow):
 
         self.yatay = QHBoxLayout()
         self.dikey = QVBoxLayout()
+        self.yatay2 = QHBoxLayout()
 
         self.yatay.addWidget(self.arama_label)
         self.yatay.addWidget(self.arama)
@@ -43,9 +45,22 @@ class MainWindow(QMainWindow):
         self.dikey.addLayout(self.yatay)
         self.dikey.addWidget(self.tableWidget)
 
+        self.demirbas_dt = demirbas_detay()
+        self.detay_widget = QWidget()
+        self.detay_widget.setLayout(self.demirbas_dt)
+        self.detay_widget.setFixedWidth(300)
+
+        self.yatay2.addLayout(self.dikey)
+        self.yatay2.addWidget(self.detay_widget)
+        self.detay_widget = QWidget()
+
+        self.widget = QWidget(self)
+        self.widget.setLayout(self.yatay2)
+        self.setCentralWidget(self.widget)
+
         toolbar = QToolBar()
         toolbar.setMovable(False)
-        toolbar.setIconSize(QSize(32,32))
+        toolbar.setIconSize(QSize(32, 32))
         self.addToolBar(toolbar)
 
         statusbar = QStatusBar()
@@ -56,7 +71,6 @@ class MainWindow(QMainWindow):
         btn_demirbas_ekle.triggered.connect(self.demirbasekle)
         btn_demirbas_ekle.setStatusTip("Demirbaş Ekle")
         toolbar.addAction(btn_demirbas_ekle)
-
 
         btn_demirbas_duzenle = QAction(QIcon("icon/dmr_duzenle2.png"), "Demirbaş Düzenle", self)
         btn_demirbas_duzenle.triggered.connect(self.demirbasduzenle)
@@ -80,7 +94,7 @@ class MainWindow(QMainWindow):
         ####################################################################
         #             M E N U     T A N I M L A M A L A R I                #
         ####################################################################
-        menu_dosya =self.menuBar().addMenu("Dosya")
+        menu_dosya = self.menuBar().addMenu("Dosya")
         menu_demirbas = self.menuBar().addMenu("Demirbaş")
         menu_kisiler = self.menuBar().addMenu("Kişiler")
         menu_kategori = self.menuBar().addMenu("Kategori")
@@ -127,9 +141,7 @@ class MainWindow(QMainWindow):
         menu_yardim.addAction(hakkinda_action)
 
         """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-        self.widget = QWidget(self)
-        self.widget.setLayout(self.dikey)
-        self.setCentralWidget(self.widget)
+
         self.liste = []
         self.liste_hazirla()
 
@@ -249,9 +261,13 @@ class MainWindow(QMainWindow):
         ind = self.tableWidget.currentRow()
         ind = int(self.tableWidget.item(ind, 0).text())
         self.dindex = ind
+        for r in self.liste:
+            if r[0] == self.dindex:
+                self.demirbas_dt.veri_yukle(r)
 
     def bos(self):
         pass
+
 
 app = QApplication(sys.argv)
 if (QDialog.Accepted == True):
