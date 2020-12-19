@@ -1,10 +1,14 @@
+from PyQt5 import QtPrintSupport
 from PyQt5.QtCore import QSize
 from PyQt5.QtGui import *
+from PyQt5.QtPrintSupport import QPrinter
 
+from demirbas_hakkinda import hakkinda
 from demirbas_urunekle import *
 from kisiler_dialog import *
 from kategori_dialog import *
 from demirbas_detay_gui import *
+from shutil import *
 import sys
 
 
@@ -100,8 +104,28 @@ class MainWindow(QMainWindow):
         menu_kategori = self.menuBar().addMenu("Kategori")
         menu_yardim = self.menuBar().addMenu("Yardım")
 
+        backup_action = QAction(QIcon("icon/backup.png"), "Yedek Ver", self)
+        backup_action.triggered.connect(self.dosya_kaydet)
+        menu_dosya.addAction(backup_action)
+
+        restore_action = QAction(QIcon("icon/restore.png"), "Yedekten Yükle", self)
+        restore_action.triggered.connect(self.yedek_al)
+        menu_dosya.addAction(restore_action)
+        menu_dosya.addSeparator()
+
+        print_action_pre = QAction(QIcon("icon/loupe.png"), "Yazdırma Önizleme", self)
+        print_action_pre.triggered.connect(self.yazdir_onizleme)
+        print_action_pre.setShortcut("Ctrl+R")
+        menu_dosya.addAction(print_action_pre)
+
+        print_action = QAction(QIcon("icon/printer.png"), "Yazdır", self)
+        print_action.triggered.connect(self.yazdir)
+        print_action.setShortcut("Ctrl+P")
+        menu_dosya.addAction(print_action)
+        menu_dosya.addSeparator()
+
         cikis_action = QAction(QIcon("icon/logout.png"), "Çıkış", self)
-        cikis_action.triggered.connect(self.bos)
+        cikis_action.triggered.connect(self.cikis)
         cikis_action.setShortcut("Ctrl+Q")
         menu_dosya.addAction(cikis_action)
 
@@ -136,7 +160,7 @@ class MainWindow(QMainWindow):
         menu_yardim.addAction(yardim_action)
 
         hakkinda_action = QAction(QIcon("icon/about.png"), "Hakkında", self)
-        hakkinda_action.triggered.connect(self.bos)
+        hakkinda_action.triggered.connect(self.hakk_goster)
         hakkinda_action.setShortcut("Ctrl+W")
         menu_yardim.addAction(hakkinda_action)
 
@@ -146,6 +170,40 @@ class MainWindow(QMainWindow):
         self.liste_hazirla()
 
         self.dindex = None
+
+    def model_olustur(self):
+        document = QTextDocument()
+        if len(self.liste) > 0:
+            cursor = QTextCursor(document)
+            model = self.liste.copy()
+            lst = ["ID", "Demirbaş No", "Ürün Adı", "İşlem Tarihi", "Teslim Alan", "Kategori", "Ürün Adeti", "Marka",
+                   "Model", "Seri No", "Garanti Süresi", "Satın Alınma Tarihi", "Bulunduğu Yer", "Açıklama"]
+
+            model.insert(0, lst)
+            styl = QTextTableFormat()
+            styl.setCellPadding(5)
+            styl.setCellSpacing(0)
+
+            table = cursor.insertTable(len(model), len(model[0]), styl)
+            for r in range(table.rows()):
+                for c in range(table.columns()):
+                    cursor.insertText(str(model[r][c]))
+                    cursor.movePosition(QTextCursor.NextCell)
+        return document
+
+    def yazdir(self):
+        dialog = QtPrintSupport.QPrintDialog()
+        if dialog.exec_() == QDialog.Accepted:
+            doc = self.model_olustur()
+            dialog.printer().setPageMargins(5, 5, 5, 5, QPrinter.Millimeter)
+            doc.print_(dialog.printer())
+
+    def yazdir_onizleme(self):
+        dialog = QtPrintSupport.QPrintPreviewDialog()
+        dialog.printer().setPageMargins(5, 5, 5, 5, QPrinter.Millimeter)
+        doc = self.model_olustur()
+        dialog.paintRequested.connect(doc.print_)
+        dialog.exec_()
 
     def veriyukle(self):
         result = self.liste
@@ -265,8 +323,50 @@ class MainWindow(QMainWindow):
             if r[0] == self.dindex:
                 self.demirbas_dt.veri_yukle(r)
 
+    def dosya_kaydet(self):
+        dizin = QFileDialog.getExistingDirectory()
+        if not dizin:
+            return
+        else:
+            if os.path.isdir(dizin):
+                try:
+                    kaynak = os.path.curdir + "/demirbas.db"
+                    hedef = dizin + "/demirbas.db"
+                    if os.path.exists(hedef):
+                        sonuc = QMessageBox.question(self, "Onay", "Belirtilen yerde dosya var. Üstüne yazılsın mı?",
+                                                     QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
+                        if sonuc == QMessageBox.Yes:
+                            copyfile(kaynak, hedef)
+                        else:
+                            return
+                except:
+                    QMessageBox.warning(self, "Hata", "Dosya kopyalanamadı")
+
+    def yedek_al(self):
+        fd = QFileDialog()
+        dosya = QFileDialog.getOpenFileName(fd, "Dosya seç", "C:\\", "DB dosyaları (*.db)")
+        sonuc = QMessageBox.question(self, "Onay",
+                                     "Yedekten dosya yüklenecek. Tüm kayıtlarınız kaybolabilir. Yedekten vei yüklemek istiyor musunuz?",
+                                     QMessageBox.Yes | QMessageBox.No, QMessageBox.No)
+        if sonuc == QMessageBox.Yes:
+            kaynak = dosya[0]
+            hedef = os.path.curdir + "/demirbas.db"
+            try:
+                copyfile(kaynak, hedef)
+            except:
+                QMessageBox.warning(self, "Hata", "Dosya yüklenemedi")
+        self.liste_hazirla()
+        self.veriyukle()
+
     def bos(self):
         pass
+
+    def cikis(self):
+        app.exit(0)
+
+    def hakk_goster(self):
+        hk = hakkinda(self)
+        hk.exec()
 
 
 app = QApplication(sys.argv)
