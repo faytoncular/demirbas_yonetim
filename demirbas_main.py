@@ -308,11 +308,10 @@ class MainWindow(QMainWindow):
 
     def onTextChange(self, e):
         self.tableWidget.clearSelection()
-
-        if len(e) > 1:
+        if len(e) > 0:
             self.filtre(e)
         else:
-            self.liste = self.liste_hazirla()
+            self.liste_hazirla()
         self.veriyukle()
 
     def onTableChange(self):
