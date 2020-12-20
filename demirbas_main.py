@@ -233,6 +233,8 @@ class MainWindow(QMainWindow):
                     db.demirbas_sil(ind)
                     self.liste_hazirla()
                     self.veriyukle()
+        else:
+            QMessageBox.information(self, "UYARI", "Lütfen bir kayıt seçiniz.")
 
     def kategori(self):
         katekr = kategori_ekr(self)
