@@ -232,6 +232,8 @@ class MainWindow(QMainWindow):
                     db.demirbas_sil(ind)
                     self.liste_hazirla()
                     self.veriyukle()
+        else:
+            res = QMessageBox.warning(self, "Uyarı", "Silmek için herhangi bir kayıt seçmediniz!")
 
     def kategori(self):
         katekr = kategori_ekr(self)
