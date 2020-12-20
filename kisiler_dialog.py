@@ -103,18 +103,23 @@ class kisiler_ekr(QDialog):
         self.tableWidget.clearSelection()
 
     def kaydet(self):
-        lst = []
-        lst.append(self.ad.text())
-        lst.append(self.gorevi.text())
-        if self.dindex != None:
-            self.db.kisi_duzenle(lst, self.dindex)
+        ad = self.ad.text().strip()
+        gorevi = self.gorevi.text().strip()
+        if len(ad) > 0 and len(gorevi) > 0:
+            lst = []
+            lst.append(ad)
+            lst.append(gorevi)
+            if self.dindex != None:
+                self.db.kisi_duzenle(lst, self.dindex)
+            else:
+                self.db.kisi_ekle(lst)
+                if self.p != None:
+                    self.done(QDialog.Accepted)
+                else:
+                    self.tableWidget.clearSelection()
+                    self.veriyukle()
         else:
-            self.db.kisi_ekle(lst)
-            if self.p != None:
-                self.done(QDialog.Accepted)
-        self.tableWidget.clearSelection()
-        self.veriyukle()
-
+            QMessageBox.information(self, "Hata", "Lütfen bilgileri tam giriniz!")
 
     def sil(self):
         ind = self.tableWidget.currentRow()
@@ -127,6 +132,8 @@ class kisiler_ekr(QDialog):
                 self.db.kisi_sil(ind)
                 self.tableWidget.clearSelection()
                 self.veriyukle()
+        else:
+            QMessageBox.information(self, "Hata", "Bir kayıt seçiniz!")
 
     def onTableWidgetClearSelection(self):
         if self.tableWidget.currentRow() > 0:

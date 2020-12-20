@@ -99,24 +99,29 @@ class kategori_ekr(QDialog):
         self.ad.clear()
         self.aciklama.clear()
         self.arama_txt.clear()
-        self.kategori_liste=self.db.kategori_liste()
+        self.kategori_liste = self.db.kategori_liste()
         self.dindex = None
         self.tableWidget.clearSelection()
 
     def kaydet(self):
-        lst = []
-        lst.append(self.ad.text())
-        lst.append(self.aciklama.toPlainText())
-        if self.dindex != None:
-            self.db.kategori_duzenle(lst, self.dindex)
-        else:
-            self.db.kategori_ekle(lst)
+        ad = self.ad.text().strip()
+        aciklama = self.aciklama.toPlainText().strip()
+        if len(ad) > 0 and len(aciklama) > 0:
+            lst = []
+            lst.append(ad)
+            lst.append(aciklama)
+            if self.dindex != None:
+                self.db.kategori_duzenle(lst, self.dindex)
+            else:
+                self.db.kategori_ekle(lst)
             if self.p != None:
                 self.done(QDialog.Accepted)
-        self.tableWidget.clearSelection()
-        self.yeni_kayit()
-        self.veriyukle()
-
+            else:
+                self.tableWidget.clearSelection()
+                self.yeni_kayit()
+                self.veriyukle()
+        else:
+            QMessageBox.information(self, "Hata", "Lütfen bilgileri tam giriniz!")
 
     def sil(self):
         self.tableWidget.clearSelection()
@@ -128,8 +133,8 @@ class kategori_ekr(QDialog):
 
                 self.yeni_kayit()
                 self.veriyukle()
-
-
+        else:
+            QMessageBox.information(self, "Hata", "Bir kayıt seçiniz!")
     def fa(self, s1, s2):
         if s1 in s2:
             return True
@@ -152,5 +157,3 @@ class kategori_ekr(QDialog):
         else:
             self.kategori_liste = self.db.kategori_liste()
         self.veriyukle()
-
-
