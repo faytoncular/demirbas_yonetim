@@ -10,6 +10,7 @@ from kategori_dialog import *
 from demirbas_detay_gui import *
 from shutil import *
 import sys
+import os
 
 
 class MainWindow(QMainWindow):
@@ -358,7 +359,7 @@ class MainWindow(QMainWindow):
         self.veriyukle()
 
     def bos(self):
-        pass
+        os.startfile("yardim.pdf")
 
     def cikis(self):
         app.exit(0)
