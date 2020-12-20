@@ -4,7 +4,7 @@ from datetime import *
 
 
 class kisiler_ekr(QDialog):
-    def __init__(self, parent, dindex=None):
+    def __init__(self, parent, dindex=None, p=None):
         super(kisiler_ekr, self).__init__(parent)
         self.dindex = dindex
         self.db = db_helper()
@@ -12,6 +12,8 @@ class kisiler_ekr(QDialog):
 
         if dindex != None:
             self.ksl = self.db.kisi(dindex)
+
+        self.p = p
 
         self.setWindowTitle("Teslim Alacak Kişiler")
 
@@ -52,6 +54,12 @@ class kisiler_ekr(QDialog):
         self.tableWidget.verticalHeader().setVisible(False)
         self.tableWidget.setAlternatingRowColors(True)
         self.tableWidget.verticalHeader().setVisible(False)
+        self.tableWidget.setEditTriggers(QAbstractItemView.NoEditTriggers)
+        self.tableWidget.setSelectionBehavior(QAbstractItemView.SelectRows)
+        self.tableWidget.setSelectionMode(QAbstractItemView.SingleSelection)
+        self.tableWidget.setShowGrid(False)
+        self.tableWidget.setAlternatingRowColors(True)
+        self.tableWidget.horizontalHeader().setStretchLastSection(True)
 
         self.tableWidget.itemSelectionChanged.connect(self.table_change)
 
@@ -102,8 +110,11 @@ class kisiler_ekr(QDialog):
             self.db.kisi_duzenle(lst, self.dindex)
         else:
             self.db.kisi_ekle(lst)
+            if self.p != None:
+                self.done(QDialog.Accepted)
         self.tableWidget.clearSelection()
         self.veriyukle()
+
 
     def sil(self):
         ind = self.tableWidget.currentRow()

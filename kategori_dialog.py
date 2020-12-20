@@ -4,11 +4,13 @@ from datetime import *
 
 
 class kategori_ekr(QDialog):
-    def __init__(self, parent, dindex=None):
+    def __init__(self, parent, dindex=None, p=None):
         super(kategori_ekr, self).__init__(parent)
         self.dindex = dindex
         self.db = db_helper()
         self.kategori_liste = self.db.kategori_liste()
+
+        self.p = p
 
         if dindex != None:
             self.kat = self.db.kategori(dindex)
@@ -52,6 +54,12 @@ class kategori_ekr(QDialog):
         self.tableWidget.verticalHeader().setVisible(False)
         self.tableWidget.setAlternatingRowColors(True)
         self.tableWidget.verticalHeader().setVisible(False)
+        self.tableWidget.setEditTriggers(QAbstractItemView.NoEditTriggers)
+        self.tableWidget.setSelectionBehavior(QAbstractItemView.SelectRows)
+        self.tableWidget.setSelectionMode(QAbstractItemView.SingleSelection)
+        self.tableWidget.setShowGrid(False)
+        self.tableWidget.setAlternatingRowColors(True)
+        self.tableWidget.horizontalHeader().setStretchLastSection(True)
 
         self.tableWidget.itemSelectionChanged.connect(self.table_change)
 
@@ -103,9 +111,12 @@ class kategori_ekr(QDialog):
             self.db.kategori_duzenle(lst, self.dindex)
         else:
             self.db.kategori_ekle(lst)
+            if self.p != None:
+                self.done(QDialog.Accepted)
         self.tableWidget.clearSelection()
         self.yeni_kayit()
         self.veriyukle()
+
 
     def sil(self):
         self.tableWidget.clearSelection()

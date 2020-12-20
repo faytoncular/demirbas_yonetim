@@ -3,6 +3,8 @@ from demirbas_db import *
 from datetime import *
 
 from demirbas_detay_gui import demirbas_detay
+from kategori_dialog import kategori_ekr
+from kisiler_dialog import kisiler_ekr
 
 
 class urunekle(QDialog):
@@ -11,7 +13,7 @@ class urunekle(QDialog):
         super(urunekle, self).__init__(parent)
         self.dindex = dindex
         self.db = db_helper()
-        self.kisiler_liste = self.db.kisiler_liste()
+        self.kisiler_liste = self.db.kisiler_aktif()
         self.kategori_liste = self.db.kategori_liste()
 
         if dindex != None:
@@ -55,6 +57,7 @@ class urunekle(QDialog):
         for kisi in self.kisiler_liste:
             self.teslim_alan.addItem(kisi[1])
         self.teslim_alan_ekle = QPushButton("KİŞİ EKLE")
+        self.teslim_alan_ekle.clicked.connect(self.kisi_ekle)
         self.islem_tarihi = QDateEdit()
         self.islem_tarihi.setDate(datetime.now().date())
         self.kategori = QComboBox()
@@ -62,6 +65,7 @@ class urunekle(QDialog):
         for kat in self.kategori_liste:
             self.kategori.addItem(kat[1])
         self.kategori_ekle = QPushButton("KATEGORİ EKLE")
+        self.kategori_ekle.clicked.connect(self.kat_ekle)
         self.adet = QLineEdit()
         self.marka = QLineEdit()
         self.model = QLineEdit()
@@ -80,7 +84,7 @@ class urunekle(QDialog):
             self.islem_tarihi.setDate(date_obj.date())
             kc = self.combo_index(self.kategori_liste, self.dmr[5])
             print(kc)
-            self.kategori.setCurrentIndex(kc+1)
+            self.kategori.setCurrentIndex(kc + 1)
             self.adet.setText(str(self.dmr[6]))
             self.marka.setText(self.dmr[7])
             self.model.setText(self.dmr[8])
@@ -122,8 +126,7 @@ class urunekle(QDialog):
 
         self.setLayout(self.tablelayout)
 
-        self.demirbas_dt=demirbas_detay()
-
+        self.demirbas_dt = demirbas_detay()
 
     def onKaydetBtnClick(self):
         lst = []
@@ -145,7 +148,7 @@ class urunekle(QDialog):
             adt = self.adet.text()
             adt = int(adt)
         except ValueError:
-            QMessageBox.warning(self,"Hata","Adet düzgün girilmemiş. Sonradan giriş yapacaksanız 0 değerini giriniz!")
+            QMessageBox.warning(self, "Hata", "Adet düzgün girilmemiş. Sonradan giriş yapacaksanız 0 değerini giriniz!")
             return
         lst.append(adt)
         lst.append(self.marka.text())
@@ -194,3 +197,22 @@ class urunekle(QDialog):
             else:
                 a += 1
         return 0
+
+    def kisi_ekle(self):
+        kisiekr = kisiler_ekr(self, p=1)
+        result = kisiekr.exec()
+        if result == QDialog.Accepted:
+            self.kisiler_liste = self.db.kisiler_aktif()
+            self.teslim_alan.clear()
+            for kisi in self.kisiler_liste:
+                self.teslim_alan.addItem(kisi[1])
+
+    def kat_ekle(self):
+        katekr = kategori_ekr(self, p=1)
+        result = katekr.exec()
+        if result == QDialog.Accepted:
+            self.kategori_liste = self.db.kategori_liste()
+            self.kategori.clear()
+            self.kategori.addItem("Kategorisiz")
+            for kat in self.kategori_liste:
+                self.kategori.addItem(kat[1])
