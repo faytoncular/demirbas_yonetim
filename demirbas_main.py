@@ -10,6 +10,7 @@ from kategori_dialog import *
 from demirbas_detay_gui import *
 from shutil import *
 import sys
+import os
 
 
 class MainWindow(QMainWindow):
@@ -232,8 +233,6 @@ class MainWindow(QMainWindow):
                     db.demirbas_sil(ind)
                     self.liste_hazirla()
                     self.veriyukle()
-        else:
-            res = QMessageBox.warning(self, "Uyarı", "Silmek için herhangi bir kayıt seçmediniz!")
 
     def kategori(self):
         katekr = kategori_ekr(self)
@@ -361,7 +360,7 @@ class MainWindow(QMainWindow):
         self.veriyukle()
 
     def bos(self):
-        pass
+        os.startfile("yardim.pdf")
 
     def cikis(self):
         app.exit(0)
