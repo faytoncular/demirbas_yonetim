@@ -145,7 +145,7 @@ class urunekle(QDialog):
             adt = self.adet.text()
             adt = int(adt)
         except ValueError:
-            QMessageBox.warning(self, "Adet düzgün girilmemiş. Sonradan giriş yapacaksanız 0 değerini giriniz!")
+            QMessageBox.warning(self,"Hata","Adet düzgün girilmemiş. Sonradan giriş yapacaksanız 0 değerini giriniz!")
             return
         lst.append(adt)
         lst.append(self.marka.text())
