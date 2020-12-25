@@ -117,6 +117,7 @@ class kisiler_ekr(QDialog):
                     self.done(QDialog.Accepted)
                 else:
                     self.tableWidget.clearSelection()
+                    self.kisiler_liste = self.db.kisiler_aktif()
                     self.veriyukle()
         else:
             QMessageBox.information(self, "Hata", "Lütfen bilgileri tam giriniz!")
@@ -131,6 +132,7 @@ class kisiler_ekr(QDialog):
                 ind = int(self.tableWidget.item(ind, 0).text())
                 self.db.kisi_sil(ind)
                 self.tableWidget.clearSelection()
+                self.kisiler_liste = self.db.kisiler_aktif()
                 self.veriyukle()
         else:
             QMessageBox.information(self, "Hata", "Bir kayıt seçiniz!")
