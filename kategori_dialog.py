@@ -145,7 +145,7 @@ class kategori_ekr(QDialog):
         lst = []
         for r in self.kategori_liste:
             for k in r:
-                if self.fa(ar, str(k)):
+                if self.fa(str(ar).casefold(), str(k).casefold()):
                     lst.append(r)
                     break
         self.kategori_liste = lst

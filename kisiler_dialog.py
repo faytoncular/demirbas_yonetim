@@ -152,7 +152,7 @@ class kisiler_ekr(QDialog):
         for r in self.kisiler_liste:
             print(r)
             for k in r:
-                if self.fa(ar, str(k)):
+                if self.fa(str(ar).casefold(), str(k).casefold()):
                     lst.append(r)
                     break
         self.kisiler_liste = lst

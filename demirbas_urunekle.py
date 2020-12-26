@@ -158,8 +158,7 @@ class urunekle(QDialog):
             grt = self.garanti_suresi.text()
             grt = int(grt)
         except ValueError:
-            QMessageBox.warning(self,
-                                "Garanti Süresi düzgün girilmemiş. Sonradan giriş yapacaksanız 0 değerini giriniz!")
+            QMessageBox.warning(self, "Hata", "Garanti Süresi düzgün girilmemiş. Sonradan giriş yapacaksanız 0 değerini giriniz!")
             return
         lst.append(grt)
 

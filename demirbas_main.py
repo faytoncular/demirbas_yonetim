@@ -304,7 +304,7 @@ class MainWindow(QMainWindow):
         lst = []
         for r in self.liste:
             for k in r:
-                if self.fa(ar, str(k)):
+                if self.fa(str(ar).casefold(), str(k).casefold()):
                     lst.append(r)
                     break
         self.liste = lst
